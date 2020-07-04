@@ -15,7 +15,7 @@
 - Set credential in config.php file at root of project folder 
 
 
-## Important config variables
+## Important Config Variables
 
 API_KEY='3NLTTNlXsi6rBWl7nYGluOdkl2htFHug' <br />
 API_MAX_CALL=5 <br />

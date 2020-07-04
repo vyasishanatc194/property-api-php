@@ -27,7 +27,7 @@ if (isset($_POST) && count($_POST)) {
 		if (isset($input['item_id']) && $input['item_id'] != "") {
 			$methodtype = "updtae";
 			$item_id = $input['item_id'];
-			$query = "SELECT * FROM $TABLE_PROPERTY WHERE `uuid` = '$item_id';";
+			$query = "SELECT pt.uuid FROM $TABLE_PROPERTY as pt WHERE `uuid` = '$item_id';";
 			$item = fetchAssociativeArray($query);
 			//verify if record exists 
 			if (!isset($item['uuid'])) {
@@ -87,7 +87,7 @@ if ((isset($_GET['id']))) {
 	$method = "create";
 }
 //get relational data property_type
-$listquery = "SELECT * FROM property_type ORDER BY id";
+$listquery = "SELECT tpt.id,tpt.title FROM $TABLE_PROPERTY_TYPE as tpt ORDER BY id";
 $property_type_array = fetchDataArray($listquery);
 if (!count($property_type_array)) {
 	//create default value if no value

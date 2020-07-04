@@ -228,7 +228,7 @@ function createOrUpdateQuery($array, $table_name, $pkfield, $querytype = "")
     //if query type not define or update check uuid to define insert or update 
     if ($querytype != "create") {
         $uuid = $array[$pkfield];
-        $numrows = countQuery("SELECT * FROM $table_name WHERE $pkfield = '$uuid'");
+        $numrows = countQuery("SELECT $pkfield FROM $table_name WHERE $pkfield = '$uuid'");
         if ($numrows > 0) {
             $query = "UPDATE $table_name SET $fields WHERE $pkfield = '$uuid';";
         }
@@ -244,6 +244,10 @@ function getSearchAndFilteredData($requestdata)
     global $DATA_LISTING_PER_PAGE;
     global $TABLE_PROPERTY;
     global $TABLE_PROPERTY_TYPE;
+	
+	//table name alias
+	$tp = $TABLE_PROPERTY;
+	$tpt = $TABLE_PROPERTY_TYPE;
     //get property data with search and filter option
     $perPage = $DATA_LISTING_PER_PAGE;
     $page = (isset($requestdata['page'])) ? (int) $requestdata['page'] : 1;
@@ -252,19 +256,19 @@ function getSearchAndFilteredData($requestdata)
     //Search and filter condition
     $filterwhere = " where 1=1";
     if (isset($requestdata['filter_from']) && $requestdata['filter_from'] != "") {
-        $filterwhere .= " AND ( $TABLE_PROPERTY.created_from = '" . $requestdata['filter_from'] . "')";
+        $filterwhere .= " AND ( $tp.created_from = '" . $requestdata['filter_from'] . "')";
     }
     if (isset($requestdata['filter_type']) && $requestdata['filter_type'] != "") {
-        $filterwhere .= " AND ( $TABLE_PROPERTY.type = '" . $requestdata['filter_type'] . "')";
+        $filterwhere .= " AND ( $tp.type = '" . $requestdata['filter_type'] . "')";
     }
     if (isset($requestdata['search']) && $requestdata['search'] != "") {
         $search = $requestdata['search'];
-        $filterwhere .= " AND ( $TABLE_PROPERTY.uuid like '%" . $search . "%' OR $TABLE_PROPERTY.county like '%" . $search . "%' OR $TABLE_PROPERTY.country like '%" . $search . "%' OR $TABLE_PROPERTY.address like '%" . $search . "%' OR $TABLE_PROPERTY.price like '%" . $search . "%' OR $TABLE_PROPERTY.postcode like '%" . $search . "%' OR $TABLE_PROPERTY_TYPE.title like '%" . $search . "%' )";
+        $filterwhere .= " AND ( $tp.uuid like '%" . $search . "%' OR $tp.county like '%" . $search . "%' OR $tp.country like '%" . $search . "%' OR $tp.address like '%" . $search . "%' OR $tp.price like '%" . $search . "%' OR $tp.postcode like '%" . $search . "%' OR $tpt.title like '%" . $search . "%' )";
     }
 
-    $queryfromwhere = " FROM $TABLE_PROPERTY INNER JOIN $TABLE_PROPERTY_TYPE ON $TABLE_PROPERTY.property_type_id=$TABLE_PROPERTY_TYPE.id" . $filterwhere;
+    $queryfromwhere = " FROM $tp INNER JOIN $tpt ON $tp.property_type_id=$tpt.id" . $filterwhere;
 
-    $listquery = "SELECT $TABLE_PROPERTY.*,$TABLE_PROPERTY_TYPE.title" . $queryfromwhere  . " ORDER BY `$TABLE_PROPERTY`.`updated_at` DESC LIMIT $startAt,$DATA_LISTING_PER_PAGE";
+    $listquery = "SELECT $tp.uuid,$tp.image_thumbnail,$tp.image_full,$tp.type,$tp.address,$tp.town,$tp.price,$tpt.title" . $queryfromwhere  . " ORDER BY `$tp`.`updated_at` DESC LIMIT $startAt,$DATA_LISTING_PER_PAGE";
     $countquery = "SELECT COUNT(*) as total" . $queryfromwhere;
 
     $pagination = fetchAssociativeArray($countquery);
